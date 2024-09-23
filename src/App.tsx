@@ -1,5 +1,5 @@
-import { useState } from "react";
-
+import { useState, useEffect } from "react";
+import axios from "axios";
 import QHeader from "./components/QHeader";
 import QInput from "./components/QInput";
 import QButton from "./components/QButton";
@@ -12,8 +12,64 @@ import QFormFilterOffer from "./components/QFormFilterOffer";
 import QSectionForm from "./components/QSectionForm";
 
 const App: React.FC = () => {
-  const [offers] = useState([]);
-  
+  const [offers, setOffers] = useState([]);
+  const [filteredOffers, setFilteredOffers] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [orderBy, setOrderBy] = useState("course-name"); // Estado para armazenar a opção de ordenação
+
+  useEffect(() => {
+    axios
+      .get("http://localhost:3000/offers")
+      .then((response) => {
+        setOffers(response.data);
+        setFilteredOffers(response.data);
+      })
+      .catch((error) => {
+        console.error("Erro ao buscar as ofertas:", error);
+      });
+  }, []);
+
+  const handleSearch = () => {
+    const lowerCaseTerm = searchTerm.toLowerCase();
+    const filtered = offers.filter((offer) =>
+      offer.courseName.toLowerCase().startsWith(lowerCaseTerm)
+    );
+    setFilteredOffers(filtered);
+  };
+
+  const handleOrderChange = (order: string) => {
+    setOrderBy(order);
+    sortOffers(order, filteredOffers);
+  };
+
+  const sortOffers = (order: string, offersToSort: any[]) => {
+    let sortedOffers;
+    switch (order) {
+      case "course-name":
+        sortedOffers = [...offersToSort].sort((a, b) =>
+          a.courseName.localeCompare(b.courseName)
+        );
+        break;
+      case "price":
+        sortedOffers = [...offersToSort].sort((a, b) =>
+          a.offeredPrice - b.offeredPrice
+        );
+        break;
+      case "rating":
+        sortedOffers = [...offersToSort].sort((a, b) => b.rating - a.rating);
+        break;
+      default:
+        sortedOffers = offersToSort;
+    }
+    setFilteredOffers(sortedOffers);
+  };
+
+  const handleKeyDown = (event: React.KeyboardEvent) => {
+    if (event.key === "Enter") {
+      handleSearch();
+    }
+  };
+
   return (
     <QLayout
       header={
@@ -24,8 +80,13 @@ const App: React.FC = () => {
             name="q"
             placeholder="Busque o curso ideal para você"
             aria-label="Buscar cursos e bolsas"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            onKeyDown={handleKeyDown}
           />
-          <QButton type="submit">Buscar</QButton>
+          <QButton type="button" onClick={handleSearch}>
+            Buscar
+          </QButton>
         </QHeader>
       }
       sidebar={<QFormFilterOffer />}
@@ -33,12 +94,17 @@ const App: React.FC = () => {
     >
       <QSectionForm
         title="Veja as opções que encontramos"
-        orderBy={<QFormOrderByOffer />}
+        orderBy={
+          <QFormOrderByOffer
+            selectedOrder={orderBy} // Passa a opção selecionada
+            onOrderChange={handleOrderChange} // Passa a função de alteração
+          />
+        }
         filter={<QFormFilterOffer />}
       />
 
       <div className="mt-6">
-        <QListCard cards={offers}>
+        <QListCard cards={filteredOffers}>
           {(card) => (
             <QCardOffer
               key={card.id}

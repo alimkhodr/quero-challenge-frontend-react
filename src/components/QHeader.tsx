@@ -16,7 +16,7 @@ const QHeader: FC<QHeaderProps> = ({ children }) => {
       <section className="h-20 bg-white lg:flex items-center justify-between hidden">
         <QRow
           sidebar={
-            <figure className="flex items-center h-full">
+            <figure className="flex items-center h-full w-60">
               <img
                 src="https://kong.quero.com/logotype-querobolsa.svg"
                 alt="Quero Bolsa"

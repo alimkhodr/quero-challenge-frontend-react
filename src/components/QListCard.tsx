@@ -17,6 +17,7 @@ const QListCard = <T extends Card>({
   return (
     <ul
       {...rest}
+      className="flex flex-row flex-wrap gap-4"
     >
       {cards.map((card) => (
         <li key={card.id}>{children(card)}</li>

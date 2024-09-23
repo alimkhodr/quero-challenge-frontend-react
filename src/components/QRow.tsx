@@ -7,7 +7,7 @@ type QRowProps = {
 
 const QRow: FC<QRowProps> = ({ sidebar, children }) => {
   return (
-    <div className="w-full px-4 lg:px-8">
+    <div className="w-full px-4 lg:px-8 flex">
       <div>{sidebar}</div>
       <div className="pl-0 lg:pl-8 flex-1">{children}</div>
     </div>

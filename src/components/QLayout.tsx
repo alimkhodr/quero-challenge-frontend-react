@@ -18,7 +18,7 @@ const QLayout: FC<QLayoutProps> = ({ sidebar, header, children, footer }) => {
       <div className="max-w-screen-2xl mx-auto w-full">
         <QRow
           sidebar={
-            <aside className="pr-8 border-r py-6 h-full">{sidebar}</aside>
+            <aside className="pr-8 border-r py-6 h-full w-60 hidden lg:flex">{sidebar}</aside>
           }
         >
           <main className="py-6">{children}</main>
